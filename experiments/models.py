@@ -20,7 +20,7 @@ class Image(models.Model):
 
     @property
     def path_img(self):
-        return f"{settings.IMG_URL}{self.name}.png"
+        return f"{settings.IMG_URL}{self.name}"
 
     def __str__(self):
         return str(self.name)
