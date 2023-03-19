@@ -8,10 +8,11 @@ class ImageSerializer(serializers.ModelSerializer):
 
     """
     img_link = serializers.ReadOnlyField(source='path_img')
+    img_org_link = serializers.ReadOnlyField(source='path_img_org')
 
     class Meta:
         model = models.Image
-        fields = ["id", "name", "clase", "img_link"]
+        fields = ["id", "name", "clase", "img_link", "img_org_link"]
 
 
 class AnswerSerializer(serializers.ModelSerializer):

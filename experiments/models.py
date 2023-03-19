@@ -20,7 +20,15 @@ class Image(models.Model):
 
     @property
     def path_img(self):
-        return f"{settings.IMG_URL}{self.name}"
+        name = self.name.split(".")[0]
+
+        return f"{settings.IMG_URL}{name}.jpg"
+
+    @property
+    def path_img_org(self):
+        name = self.name.split(".")[0]
+
+        return f"{settings.IMG_ORG_URL}{name}.jpg"
 
     def __str__(self):
         return str(self.name)
