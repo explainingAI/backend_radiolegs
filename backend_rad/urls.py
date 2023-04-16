@@ -26,5 +26,6 @@ urlpatterns = [
          jwt_views.TokenRefreshView.as_view(),
          name='token_refresh'),
     path('', include('authentification.urls')),
-    path('exps/', include('experiments.urls'))
+    path('exps/', include('experiments.urls')),
+    path('back/', include('backoffice.urls')),
 ]

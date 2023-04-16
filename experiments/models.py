@@ -27,6 +27,7 @@ class Image(models.Model):
     @property
     def path_img_org(self):
         name = self.name.split(".")[0]
+        name = name.split("_")[0]
 
         return f"{settings.IMG_ORG_URL}{name}.jpg"
 
