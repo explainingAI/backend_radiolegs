@@ -1,8 +1,13 @@
 import csv
-from django.http import HttpResponse
+
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import render
 
 from experiments import models
+
+
 # Create your views here.
 
 @login_required
@@ -16,7 +21,7 @@ def get_results(request, experiment_id):
     )
 
     writer = csv.writer(response)
-    writer.writerow(["IMG ID", "Trust", "Experiment", "Start", "End"])
+    writer.writerow(["IMG", "Class", "Percentatge", "Trust", "Experiment", "Start", "End"])
 
     start_exp = None
     start = None
@@ -25,8 +30,25 @@ def get_results(request, experiment_id):
             start_exp = ans.start_time
             start = start_exp
 
-        writer.writerow([ans.image.pk, ans.trust, experiment_id, start, ans.end_time])
+        nom_img = ans.image.name
+        percent, nom = nom_img.split("_")
+
+        writer.writerow([nom, ans.image.clase, percent, ans.trust, experiment_id, start, ans.end_time])
 
         start = ans.end_time
 
     return response
+
+
+@login_required
+def main(request):
+    experiments = models.Experiment.objects.all()
+
+    context = []
+    for exp in experiments:
+        total = len(exp.answer_set.all())
+        answered = len(exp.answer_set.all().filter(~Q(trust=None)))
+
+        context.append({"percent": round((total - answered) / total, 4) * 100, "exp": exp})
+
+    return render(request, 'main.html', {"experiments": context})

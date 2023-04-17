@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiments</title>
+    <style>
+        table, th, td {
+            border:1px solid black;
+        }
+        th, td{
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Experiments</h1>
+    <table>
+        <tr>
+            <th>Experiment</th>
+            <th>Usuari</th>
+            <th>Percentatge</th>
+            <th>Descarrega</th>
+        </tr>
+        {% for exp in experiments %}
+            <tr>
+                <td>{{ exp.exp.pk }}</td>
+                <td>{{ exp.exp.user.username }}</td>
+                <td>{{ exp.percent }} %</td>
+                <td><a href="{% url 'backoffice:results' exp.exp.id %}">Descarrega dades</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
