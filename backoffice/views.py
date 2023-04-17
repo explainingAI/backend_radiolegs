@@ -9,6 +9,15 @@ from experiments import models
 
 
 # Create your views here.
+def answer_2_csv(answer: models.Answer):
+    nom_img = answer.image.name
+    if "_" in nom_img:
+        percent, nom = nom_img.split("_")
+    else:
+        percent, nom = 100, nom_img
+
+    return [nom, answer.image.clase, percent, answer.trust, answer.experiment.pk]
+
 
 @login_required
 def get_results(request, experiment_id):
@@ -30,12 +39,48 @@ def get_results(request, experiment_id):
             start_exp = ans.start_time
             start = start_exp
 
-        nom_img = ans.image.name
-        percent, nom = nom_img.split("_")
-
-        writer.writerow([nom, ans.image.clase, percent, ans.trust, experiment_id, start, ans.end_time])
+        writer.writerow(answer_2_csv(answers) + [experiment_id, start, ans.end_time])
 
         start = ans.end_time
+
+    return response
+
+
+@login_required
+def get_only_shared(request):
+    experiments = models.Experiment.objects.all()
+
+    aux = {}
+    for exp in experiments:
+        answers = exp.answer_set.all()
+        for ans in answers:
+            key = ans.image.name
+            if key not in aux:
+                aux[key] = []
+
+            aux[key].append(ans)
+
+    answers_shared = list(filter(lambda x: len(x) > 1, list(aux.values())))
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={f"Content-Disposition": f'attachment; filename="merged.csv"'},
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(
+        ["IMG", "Class", "Percentatge"] + (["Trust", "Experiment"] * len(answers_shared[0])))
+
+    for set_of_ans in answers_shared:
+        aux = None
+
+        for ans in set_of_ans:
+            if aux is None:
+                aux = answer_2_csv(ans)
+            else:
+                aux += [ans.trust, ans.experiment.pk]
+
+        writer.writerow(aux)
 
     return response
 
